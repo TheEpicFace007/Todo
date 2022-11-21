@@ -8,7 +8,8 @@ export default function AddTodo(props: { addTodo: (text: string) => void }) {
 
     return (
         <View style={styles.container}>
-            <TextInput style={styles.text} placeholder="Ajouter une tâche" onChangeText={t => setText(t)}/>
+            <TextInput style={styles.text}  placeholder="Ajouter une tâche" onChangeText={t => setText(t)} 
+            value={text}/>
             <TouchableOpacity style={styles.button} onPress={() => {
                 if (text.length > 0) {
                     props.addTodo(text);
@@ -17,7 +18,7 @@ export default function AddTodo(props: { addTodo: (text: string) => void }) {
                     Alert.alert("Erreur", "La tâche ne peut pas être vide");
                 }
             }}>
-                <Text><Icon name="plus" size={20} /></Text>
+                <Text><Icon name="plus" size={32} /></Text>
             </TouchableOpacity>
         </View>
     )

@@ -9,17 +9,29 @@ export default function TodoListItem(props: { item: { text: string, key: string,
         setDone(!done);
         props.toggleTodo(props.item.key);
     }
+    const [deleteStage, setDeleteStage] = useState(0);
+    const onDelete = () => {
+        if (deleteStage == 0) {
+            setDeleteStage(1);
+            setTimeout(() => {
+                setDeleteStage(0);
+            }, 2000);
+        } else {
+            props.deleteTodo(props.item.key);
+        }
+    }
+
 
     return (
         <View style={styles.container}>
             <Text style={[styles.text, {
                 textDecorationLine: props.item.done ? "line-through" : "none"
-            }]}>{props.item.text} </Text>
+            }]}>  {props.item.text}  </Text>
             <TouchableOpacity style={styles.buttons} onPress={onCheck}>
-                <Text><Icon name="check" size={20} /></Text>
+                <Text><Icon name="check" size={21} /></Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttons} onPress={() => props.deleteTodo(props.item.key)}>
-                <Text><Icon name="trash" size={20} /></Text>
+            <TouchableOpacity style={[styles.buttons]} onPress={onDelete}>
+                <Text><Icon name="trash" size={21} color={deleteStage == 1 ? "#fe3000" : "#000"} /></Text>
             </TouchableOpacity>
         </View>
     )
@@ -34,12 +46,13 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 18,
+        flexBasis: '75%',
+        paddingHorizontal: 10,
     },
     buttons: {
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
-        paddingHorizontal: 10,
-        border: "1px solid black",
+        marginHorizontal: 10,
     }
 });

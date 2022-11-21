@@ -2,45 +2,63 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import AddTodo from './components/AddTodo';
 import Header from './components/Header';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { uuid } from './utils';
 import TodoListItem from './components/TodoListItem';
+import AsyncStorage, { useAsyncStorage } from '@react-native-async-storage/async-storage';
+
 
 export default function App() {
-  const [todos, setTodos] = useState([
-    { text: 'Faire le ménage', key: uuid(), done: false },
-    { text: 'Faire les courses', key: uuid(), done: false },
-    { text: 'Faire la vaisselle', key: uuid(), done: true },
-  ]);
+  const [todos, setTodos] = useState([]);
+  const { getItem: getTodoItem, setItem: setTodoItem, mergeItem } = useAsyncStorage('todos')  
+  
+  const getodos = async () => {
+    const todos = await getTodoItem();
+    if (todos) {
+      setTodos(JSON.parse(todos));
+    } else {
+      setTodoItem(JSON.stringify([]));
+    }
+  }
+  useEffect(() => {
+    getodos();
+  }, [])
+
   return (
     <View style={styles.container}>
       <Header />
       <AddTodo addTodo={(todoTxt) => {
         setTodos((prevTodos) => {
-          return [
+          const newTodo = [
             { text: todoTxt, key: uuid(), done: false },
             ...prevTodos
           ]
+          setTodoItem(JSON.stringify(newTodo));
+          return newTodo;
         })
       }} />
       <FlatList data={todos} renderItem={(info) => {
         return (
           <TodoListItem item={info.item} toggleTodo={(key) => {
             setTodos((prevTodos) => {
-              return prevTodos.map(todo => {
+              let todos = prevTodos.map(todo => {
                 if (todo.key == key) {
                   todo.done = !todo.done;
                 }
                 return todo;
-              })
+              });
+              setTodoItem(JSON.stringify(todos));
+              return todos;
             })
           }} deleteTodo={key => {
             setTodos((prevTodos) => {
-              return prevTodos.filter(todo => todo.key != key)
+              const todos = prevTodos.filter(todo => todo.key != key)
+              setTodoItem(JSON.stringify(todos));
+              return todos;
             })
           }} />
         )
-      }}/>
+      }} />
       <StatusBar style="auto" />
     </View>
   );
